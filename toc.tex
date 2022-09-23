@@ -1,0 +1,478 @@
+\documentclass{article}
+\setlength{\parindent}{0cm}   
+\setlength{\parskip}{6pt}
+\usepackage{mathtools}
+\usepackage{amssymb}
+
+\setcounter{tocdepth}{1}
+\begin{document}
+
+\title{Theory of Computation}
+\maketitle
+\thispagestyle{empty}
+\clearpage
+
+\tableofcontents
+\clearpage
+\section{Regular languages}
+
+\subsection{DFA}
+
+A deterministic finite automatum (DFA) is represented by the tuple $(Q, \Sigma, \delta, q_0, F)$.
+
+Some languages accepted by DFA:
+
+\begin{enumerate}
+\item\label{item:1} $\{ w \in \{0, 1\}^{*} \mid w $ has even number of $0$'s$\}$. 
+\item\label{item:2} $\{ w \in \{a, b, c\}^{*} \mid w $ ends in $ab\}$. 
+\item\label{item:3} $\{ w \in \{0, 1\}^{*} \mid w $ is divisible by $3\}$. 
+\item\label{item:12} $\{ w \in \{0, 1\}^{*} \mid \text{3rd last symbol of } w \text{ is a } 1\}$. This can be generalized.
+\item\label{item:6} $\{ x \mid |x| = 3\}$. This can be generalized.
+\item\label{item:4} $\{ w \in \{0, 1\}^{*} \mid w $ does not contain $11$ as a substring$\}$.
+\end{enumerate}
+
+For the last language, use dump state to remove substrings $11$. A dump state is a state from where the automaton cannot reach an accept state.
+
+For a language, there can be multiple DFAs accepting it. But every DFA accepts exactly one language.
+
+The state space $Q$ partitions the set of all strings.
+
+Let $L \subset \Sigma^{*}$. We say that $L$ is regular if there exists a DFA M such that $L = L(M)$.
+
+A non-regular language is $\{ 0^n1^n \mid n > 0\}$. This involves counting and keeping track of the count.
+
+Let $A, B \in \Sigma^{*}$. The following are called regular operations. 
+\begin{enumerate}
+\item\label{item:7} Union: $A\cup B = \{ x \mid x \in A \text{ or } x\in B \}$. 
+\item\label{item:8} Concatenation: $AB = A\cdot B = \{ xy \mid x \in A \text{ and } y \in B \}$. 
+\item\label{item:9} Kleene star: $A^{*} = \{x_1\cdots x_k \mid k \geq 0 \text{ and } x_i\in A \text{ for all } i \}$.
+\end{enumerate}
+
+Note that $\epsilon \in A^{*}$. This is the empty string.
+
+\subsection{NFA}
+
+In a non-deterministic finite automatum (NFA), a state may jump to multiple states simultaneously. Computation occurs simultaneously along each path.
+
+An input is accepted if there is some computation path leading to accept state.
+
+\begin{enumerate}
+\item\label{item:10} $\epsilon$-transitions: moving from one state to another without any input. 
+\item\label{item:5} The transitions are labelled with symbols from the set $\Sigma_{\epsilon} = \Sigma \cup \{\epsilon\}$.
+\end{enumerate}
+
+The description of NFA is almost like that of DFA except that the transition function looks like $\delta: Q \times \Sigma_{\epsilon} \to 2^Q$.
+
+As in DFA, we define $L(N) = \{w \in \Sigma^{*} \mid N \text{ accepts } w \}$, where $N$ is an NFA.
+
+Examples of languages accepted by NFA: 
+\begin{enumerate}
+\item\label{item:11} $\{ w \mid |w| \text{ is divisible by } 2 \text{ or } 5 \}$. Bifurcate the cases using $\epsilon$-transitions.
+\end{enumerate}
+
+By default, every DFA is an NFA. But any NFA $N$ has a corresponding DFA $D$ such that $L(N) = L(D)$.
+
+States that are not reachable from the start state are called ``dead states''.
+
+Closure property: regular languages are closed under union, concatenation and Kleene star operations.
+
+\subsection{RegEx}
+
+Regular expressions (RegEx) are algebraic representation of languages. They find applications in text editors, compiler design, etc.
+
+The union $\cup$ is often written as $+$ and the concatenation $\cdot$ is dropped.
+
+\renewcommand*{\arraystretch}{1.4}  
+\begin{center}
+\begin{tabular}{ l  l  }
+  RegEx & Language \\
+  $0$ & $\{0 \}$ \\
+  $\epsilon$ & $\{\epsilon\}$ \\
+  $0+ 01$ & $\{0, 01\}$ \\
+  $(0+01)1^{*}$ & $\{ 0, 01, 01, 011, \ldots \}$
+  \end{tabular}
+\end{center}
+
+For every RegEx $RE$, there is a unique language $L(RE)$. The converse may not be true.
+
+Precedence of the operators (high to low): $( ), *, \cdot, \cup$.
+
+Also, $\emptyset^{*} = \{ \epsilon \}$.
+
+Some more examples:
+
+\renewcommand*{\arraystretch}{1.4}  
+\begin{center}
+\begin{tabular}{ l  l  }
+  Language & RegEx \\
+  $\{ w \mid w \text{ has a single } 1 \}$ & $0^{*}10^{*}$ \\
+  $\{ w \mid w \text{ has at most a single } 1 \}$ & $0^{*} + 0^{*}10^{*}$ \\
+  $\{ w \mid |w| \text{ is divisible by } 3\} $ & $((0+1)(0+1)(0+1))^{*}$ \\
+\end{tabular}
+\end{center}
+
+Union $+$ and concatenation $\cdot$ are associative operations on RegEx. Also, $\cdot$ distributes over $+$ both from the left and right. $+$ commutes. Also, $R + \emptyset = R$ and $R\cdot \epsilon = R$. Finally, $(R^*)^{*} = R^*$.
+
+A language $L$ is regular iff there exists a RegEx $R$ such that $L = L(R)$.
+
+\subsection{GNFA}
+
+A generalized non-deterministic finite automatum (GNFA) is just like an NFA except that it has RegEx labelling its transitions.
+
+GNFA is quite useful in converting a DFA into RegEx. We modify the given DFA into a GNFA so that the following hold: 
+\begin{enumerate}
+\item\label{item:13} There is a unique accept state. 
+\item\label{item:14} There are no incoming transitions to the start state and no outgoing transitions from the accept state. 
+\item\label{item:15} There are transitions from start state to every other state and from every state to the accept state. 
+\item\label{item:16} There is a transition between every pair of states that are not the start/accept state.
+\end{enumerate}
+
+Remove each state one at a time without messing up transitions. You should end up with a RegEx and just the start state and accept state.
+
+\subsection{Closure}
+
+Complement of a language $L$ is defined by $\bar{L} = \Sigma^{*} - L$.
+
+Regular languages are closed under complementation. Simply change the set of final states to $F^{\prime} = Q-F$.
+
+Regular languages are also closed under intersection. This follows from De Morgan's law and closure under complementation and union.
+
+Regular languages are also under closed set difference.
+
+For a language $L \subset \Sigma^{*}$, we define rev$(L) = \{ w \in \Sigma^{*} \mid \text{rev}(w) \in L\}$. If $L$ is regular rev$(L)$ is also regular.
+
+Let $\Sigma$ and $\Omega$ be two alphabets. Let $f: \Sigma \to \Omega$ be a function. Then $f$ induces a homomorphism $\Sigma^{*} \to \Omega^{*}$. Let $w = a_1a_2\cdots a_n \in \Sigma^{*}$. Then 
+\begin{displaymath}
+f(w) = f(a_1)f(a_2)\cdots f(a_n).
+\end{displaymath}
+Let $L \subset \Sigma^{*}$. Then $f(L) = \{ f(w) \in \Omega^{*}\mid w \in L\}$. If $L$ is regular then $f(L)$ is also regular.
+
+Let $L \subset \Omega^{*}$. Then $f^{-1}(L) = \{w \in \Sigma^{*} \mid f(w) \in L\}$. If $L$ is regular then $f^{-1}(L)$ is also regular.
+
+\section{Context-free languages}
+
+Non-regular languages typically require us to maintain some count.
+
+\subsection{Pumping lemma}
+
+If $L$ is a regular language then $\exists p \geq 0$, such that for all strings $w\in L$ with $|w| \geq p$, $\exists $ a partition of $w = xyz$ such that $|xy| \leq p$ and $|y| > 0$, and for all $i \geq 0$, $xy^iz \in L$.
+
+Contrapositive form of the pumping lemma is quite useful to proving non-regularity of languages.
+
+Closure properties can also be used in proving non-regularity of languages.
+
+Some examples of non-regular languages are
+
+\begin{enumerate}
+\item\label{item:17} $\{ 0^p \mid p \text{ is a prime} \}$. 
+\item\label{item:18} $\{ a^lb^mc^n \mid l+m \leq n \}$.
+\end{enumerate}
+
+\subsection{DFA minimization}
+
+The following algorithm produces a minimal DFA from a given DFA. Suppose the given DFA is $D = (Q, \Sigma, \delta, q_0, F)$.
+\begin{enumerate}
+\item\label{item:19} Construct a table of all $\{ p, q \}$ pairs where $p, q \in Q$. 
+\item\label{item:20} Mark a pair $\{p, q\}$ if $p \in F$ and $q \not\in F$ or vice versa. 
+\item\label{item:21} Repeat the following until no more pair can be marked.
+\begin{enumerate}
+\item\label{item:22} Mark $\{p, q\}$ if $\{ \delta(p, a), \delta(q, a) \}$ is marked for some $a \in \Sigma$.
+\end{enumerate} 
+\item\label{item:23} Two or more states are equivalent if they are not marked.
+\end{enumerate}
+
+\subsection{CFG}
+
+Context-free grammar recognizes a larger class of languages than regular languages. They find applications in programming languages and compiler design.
+
+A CFG has terminal symbols (like alphabet) and variable symbols which are replaced by either variables or terminal symbols. One of the variables is the start variable $S$. Production rules dictate how variables get replaced.
+
+For the non-regular language $\{ 0^n1^{2n} \mid n \geq 0 \}$, we have the following CFG: 
+
+\renewcommand*{\arraystretch}{1.4}  
+\begin{center}
+\begin{tabular}{ l  l  l }
+  $\Sigma$ & Terminals & $\{ 0, 1 \}$ \\
+  $V$ & Variables & $\{ S, A, B \}$ \\
+  $P$ & Production rules & $S \to ASB \mid \epsilon$\\
+  &          & $A \to 0$ \\
+  &          & $B \to 11$ \\
+  $S$ & Start variable & $S$
+\end{tabular}
+\end{center}
+
+A CFG is represented by the tuple $(V, \Sigma, P, S)$.
+
+A language $L$ is said to be context-free language (CFL) if $\exists$ a CFG $G$ such that $L = L(G)$.
+
+For the CFL $\{ a^nb^m \mid n \geq 0, n \leq m \leq 2n \}$, we have the following CFG:
+
+\renewcommand*{\arraystretch}{1.4}  
+\begin{center}
+\begin{tabular}{ l  l  l }
+  $\Sigma$ & Terminals & $\{ a, b \}$ \\
+  $V$ & Variables & $\{ S, A, B \}$ \\
+  $P$ & Production rules & $S \to ASB \mid \epsilon$\\
+  &          & $A \to a$ \\
+  &          & $B \to b \mid bb$ \\
+  $S$ & Start variable & $S$
+\end{tabular}
+\end{center}
+
+For the CFL $\{ w \in \{(, )\}^{*} \mid w \text{ is balanced}\}$, we have the production rule $S \to (S) \mid SS \mid \epsilon$.
+
+Regular languages are context-free.
+
+\subsection{Parse tree}
+
+Let $G$ be a CFG and $w \in L(G)$. A parse tree of $w$ is a rooted ordered tree that represents the derivation of $w$ with respect to $G$.
+
+Some properties of parse trees are
+
+\begin{enumerate}
+\item\label{item:25} Every internal node is a variable. 
+\item\label{item:24} Every leaf node is either a terminal or $\epsilon$. 
+\begin{enumerate}
+\item\label{item:27} If it is $\epsilon$, it is the only child of its parent.
+\end{enumerate} 
+\item\label{item:28} If an internal node is labelled $R$ and $A_1$, $A_2$, $\ldots$, $A_k$ are the children of $R$ from left to right, then $R \to A_1A_2\cdots A_k$ is a production rule. 
+\item\label{item:29} Concatenation of the leaves of a parse tree from left to right gives the string $w$.
+\end{enumerate}
+
+There may exist multiple parse trees for a string w.r.t. a grammar.
+
+The derivation of a string $w$ w.r.t. a grammar $G$ is a sequence of substitutions that yield $w$.
+
+A leftmost derivation of $w$ w.r.t. $G$ is a derivation where in each step the left most variable of a string gets replaced.
+
+A string $w \in L(G)$ is said to be ambiguous if it has $2$ leftmost derivations. A grammar $G$ is said to be ambiguous if $\exists$ some ambiguous string $\in L(G)$.
+
+A CFL $L$ is inherently ambiguous if all CFGs accepting $L$ are ambiguous.
+
+\subsection{Chomsky normal form}
+
+A CFG $G = (V, \Sigma, P, S)$ is said to be in Chomsky normal form (CNF) if 
+\begin{enumerate}
+\item\label{item:31} every production rule is of the following types \begin{enumerate}
+\item\label{item:30} $A \to BC$ where $B, C \in V$,
+\item\label{item:26} $A \to a$ where $a \in \Sigma$,
+\end{enumerate} 
+\item\label{item:32} $S$ does not appear on the right hand side of any production rule, and
+\item\label{item:33} the rule $S\to \epsilon$ may be present depending on whether $\epsilon \in L(G)$ or not.
+\end{enumerate}
+
+Every CFL has a CNF grammar.
+
+To reduce a CFG to CNF, use the following algorithm.
+
+\begin{enumerate}
+\item\label{item:34} If $S$ appears on the right hand side of any rule then add a new start variable $S_0$, and add the rule $S_0 \to S$. 
+\item\label{item:35} Removing $\epsilon$-transitions: remove $A \to \epsilon$ and for every occurrence of $A$ on the right hand side of any rule, remove that occurrence and add a new rule. 
+\item\label{item:36} Remove unit rules. $A\to B, B \to u$ to $B \to u, A \to u$. 
+\item\label{item:37} Shortening the right hand side. Suppose $A \to u_1u_2\cdots u_k$. Add a variable $A_1 \to u_1u_2$ so that $A \to A_1u_3\cdots u_k$. 
+\item\label{item:38} A few more steps.
+\end{enumerate}
+
+\subsection{PDA}
+
+A pushdown automaton is like a $\epsilon$-NFA with a stack. It has an input tape, a finite set of states and an unbounded stack.
+
+Only the topmost element of the stack can be accessed at a given time. To access an intermediate element, all elements above it must be popped.
+
+A step of computation by PDA is represented as $(p, a_i, X) \to (q, Y)$, which means the PDA moves from state $p$ to $q$ upon reading input $a_i$ from the input tape and changes the topmost element of the stack from $X$ to $Y$.
+
+We may allow the stack to have a different alphabet $\Omega$.
+
+Stack operations: 
+\begin{enumerate}
+\item\label{item:39} $\epsilon \to Y$ means pushing $Y$ onto the stack. 
+\item\label{item:40} $X \to \epsilon$ means popping $X$ from the stack.
+\end{enumerate} 
+
+A PDA may be represented by the tuple $(Q, \Sigma, \Omega, \delta, q_0, F)$. Due to non-determinism, there can be multiple transitions from the same tuple $(p, a_i, X)$. A transition is also represented as 
+\begin{displaymath}
+p \xrightarrow{a_i, X\to Y} q 
+\end{displaymath}
+
+Some special operations: 
+\begin{enumerate}
+\item\label{item:41} $\displaystyle p \xrightarrow{\epsilon, \epsilon \to \#} q$. Push $\#$ onto the stack without reading any input.
+\item\label{item:42} $\displaystyle p \xrightarrow{a, \epsilon \to A} q$. Push $A$ onto the stack upon reading $a$. 
+\item\label{item:43} $\displaystyle p \xrightarrow{\epsilon, \epsilon \to \epsilon} q$. Transition between states without reading any input and without changing the stack.
+\end{enumerate}
+
+A language $L$ is a CFL iff $\exists$ a PDA $P$ such that $L = L(P)$. Basically, CFG is equivalent to PDA.
+
+\subsection{Closure}
+
+CFLs are closed under union, concatenation, Kleene star, reversal, homomorphisms and inverse homomorphisms.
+
+Closure under concatenation is easily seen through additional rule $S \to S_1S_2$. For Keene star, put additional rule $S \to S_1S$. For reversal, we replace the rule $A \to A_1A_2\cdots A_k$ with the rule $A \to A_k\cdots A_2A_1$.
+
+If $L_1$ is a CFL and $L_2$ regular, then $L_1 \cap L_2$ is CFL.
+
+CFLs are not closed under intersection, complementation and set difference.
+
+As one application of closure, suppose we want to show that $L = \{ a^nb^na^{2m}b^{2m} \mid n, m \geq 0 \}$ is a CFL. We use the fact that $L_1 = \{ a^nb^n \mid n \geq 0 \}$ is a CFL. Consider the homomorphism $h(a) = aa, h(b) = bb$. Then $h(L_1) = \{ a^{2n}b^{2n} \mid n \geq 0 \}$ so that $L = L_1\cdot h(L_1)$ is a CFL.
+
+\subsection{DPDA}
+
+A deterministic pushdown automaton is a PDA such that $\delta(q, a_i, X)$ has at most one element and if $\delta(q, \epsilon, X) \ne \emptyset$ then $\delta(q, a, X) = \emptyset$ for all $a \in \Sigma$.
+
+A language $L$ is said to be a deterministic context-free language if $\exists$ a DPDA $M$ such that $L = L(M)$.
+
+Examples and non-examples: 
+\begin{enumerate}
+\item\label{item:44} $\{0^n1^n\ \mid n \geq 0\}$ is a DCFL. 
+\item\label{item:45} $\{ w \in \{a, b\}^{*} \mid w = \text{rev}(w) \}$ is not a DCFL as it necessarily uses non-determinism to figure out the midpoint of the input string. 
+\item\label{item:46} $L = \{ a^nb^nc^n \mid n \geq 0 \}$ is not a CFL. But $\bar{L}$ is a CFL and not a DCFL.
+\end{enumerate}
+
+DCFLs are closed under complementation.
+
+DCFLs are not closed under union or intersection.
+
+Chomsky hierarchy: Regular $\subset$ DCFL $\subset$ CFL.
+
+As an application, let $L$ be the set of all strings in $a, b, c$ such that the number of $a$'s are the same as those of $b$'s and $c$'s. Consider $L_1 = \{a^{*}b^{*}c^{*}\}$ which is regular. See that $L \cap L_1 = \{ a^nb^nc^n \mid n \geq 0 \}$, which is not CFL. Therefore, $L$ is not a CFL.
+
+\section{Turing machines}
+
+\subsection{TM}
+
+Finite automata has finite control with no memory. Pushdown automata has finite control with memory in the form of stack.
+
+A Turing machine has finite control and memory in the form of an unbounded tape which can be accessed using a tape head. It also has a designated accept state $q_A$ and reject state $q_R$.
+
+A typical transition of a Turing machine (TM) is 
+\begin{displaymath}
+  \delta(p, X) = (q, Y, L),
+\end{displaymath}
+where $X, Y$ are tape symbols and $L$ denotes movement of tape head to left.
+
+If $\Omega$ is the tape alphabet, we may write $\delta : Q \times \Omega \to Q \times \Omega \times \{ L, R \}$.
+
+Input is written on the tape itself and is followed by the blank symbol infinitely. Input alphabet $\Sigma \subset \Omega$. The blank symbol $\in \Omega - \Sigma$.
+
+If the input head tries to move to the left of the leftmost cell of the tape, it stays at its current position.
+
+A TM $M$ is represented by a tuple $(Q, \Sigma, \Omega, \delta, q_0, q_A, q_R)$.
+
+\subsection{Configuration}
+
+A configuration of a TM $M$ with respect to an input $w$ is a snapshot of the machine consisting of 
+\begin{enumerate}
+\item\label{item:47} the current state, 
+\item\label{item:48} the current contents of the tape, 
+\item\label{item:49} the position of the tape head.
+\end{enumerate}
+
+We represent a config by $uqv$ where $q \in Q$, $u, v \in \Omega^{*}$ such that $q$ is the current state, $uv$ is the current contents of the tape and the tape head points to the first symbol of $v$.
+
+Some standard configs are 
+\begin{enumerate}
+\item\label{item:50} start config: $q_0w$, where $w$ is the input,
+\item\label{item:51} accept config: $uq_Av$, 
+\item\label{item:52} reject config: $uq_Rv$.
+\end{enumerate}
+
+Unlike other automata, a TM has a reject state. Of course, $q_A \ne q_R$. 
+
+$M$ halts on $w$ if it either accepts or rejects it. $M$ is said to be a halting TM if for all $w \in \Omega^{*}$, $M$ halts on $w$.
+
+\subsection{Recognizability and decidability}
+
+The language of a TM $M$ is defined as $L(M) = \{w \in \Sigma^{*} \mid M \text{ accepts } w \}$.
+
+A language $L$ is Turing recognizable (or simply recognizable) if $\exists$ a TM $M$ such that $L = L(M)$.
+
+A language $L$ is Turing decidable (or simply decidable) if $\exists$ a halting TM $M$ such that $L = L(M)$.
+
+Consider $L = \{a^nb^nc^n \mid n \geq 0\}$. This is decidable because we can have a TM that works in the following way.
+\begin{enumerate}
+\item\label{item:53} Checks whether the input is of the form $a^{*}b^{*}c^{*}$. If not, then reject. 
+\item\label{item:54} Crosses off the first uncrossed $a$, the first uncrossed $b$, the first uncrossed $c$. If this fails, reject. 
+\item\label{item:55} If all symbols are crossed off, then accept.
+\end{enumerate}
+
+\subsection{Variations of TM}
+
+Multiple tape TM are equivalent to single tape TM. The idea is to simulate a $k$-tape TM by using a single tape TM. We store all the contents of the $k$-tapes on the single tap. For every symbol $a \in \Omega$, add a symbol $\bar{a}$. Use this symbol to keep track of the tape head.
+
+2-stack TM are equivalent to single tape TM. For example, suppose at some given time, the config is $uqv$. The two stacks can store $u$ and $v$.
+
+Queue machine is equivalent to single tape TM as well.
+
+\subsection{Non-determinism}
+
+In a non-deterministic TM, one can have multiple transitions from a given config. That is, 
+\begin{displaymath}
+  \delta: Q \times \Omega \to 2^{Q \times \Omega \times \{L, R\}}.
+\end{displaymath}
+
+Consider $L = \{ 0^t \mid t \text{ is composite} \}$.
+
+\section{Complexity theory}
+
+Henceforth, we consider only decidable languages. We assume that all our TM are halting TM.
+
+\subsection{Space-time complexity}
+
+Let $M$ be a deterministic TM. 
+\begin{enumerate}
+\item\label{item:56} The running time of $M$ is said to be 
+\begin{displaymath}
+t: \mathbb{N} \to \mathbb{N}
+\end{displaymath}
+if for all $x \in \Sigma^{*}$, $M$ halts in at most $O(t(|x|))$ steps. 
+\item\label{item:57} The space required by $M$ is said to be 
+\begin{displaymath}
+s: \mathbb{N} \to \mathbb{N}
+\end{displaymath}
+if for all $x\in \Sigma^{*}$, $M$ uses at most $O(s(|x|))$ cells in its workspace.
+\end{enumerate}
+
+We always count the amount of resource used as a function of the input length.
+
+Since we use the $O$-notation we ignore the multiplicative constants and lower order terms.
+
+Let $t : \mathbb{N} \to \mathbb{N}$, $s: \mathbb{N} \to \mathbb{N}$. Then we define 
+\begin{align*}
+  \text{TIME}(t(x)) &= \{ L \mid \exists \text{ a deterministic TM $M$ having running time } t(x) \text{ such that } L=L(M) \} \\
+  \text{SPACE}(s(n)) &= \{ L \mid \exists \text{ a deterministic TM $M$ using $s(n)$ space such that } L = L(M) \}
+\end{align*}
+
+Let $N$ be a non-deterministic TM.
+
+\begin{enumerate}
+\item\label{item:56} The running time of $N$ is said to be 
+\begin{displaymath}
+t: \mathbb{N} \to \mathbb{N}
+\end{displaymath}
+if for all $x \in \Sigma^{*}$, every computation path in $N$ halts in at most $O(t(|x|))$ steps. 
+\item\label{item:57} The space required by $N$ is said to be 
+\begin{displaymath}
+s: \mathbb{N} \to \mathbb{N}
+\end{displaymath}
+if for all $x\in \Sigma^{*}$, every computation path of $N$ uses at most $O(s(|x|))$ cells in its workspace.
+\end{enumerate}
+
+Let $t : \mathbb{N} \to \mathbb{N}, s: \mathbb{N} \to \mathbb{N}$. Then we define 
+\begin{align*}
+  \text{NTIME}(t(x)) &= \{ L \mid \exists \text{ a NDTM $N$ having running time } t(x) \text{ such that } L=L(N) \} \\
+  \text{NSPACE}(s(n)) &= \{ L \mid \exists \text{ a NDTM $M$ using $s(n)$ space such that } L = L(N) \}
+\end{align*}
+
+\subsection{P and NP}
+
+We define 
+\begin{align*}
+  \text{P} &= \bigcup_{k\geq 0} \text{TIME}(n^k) \\
+  \text{NP} &= \bigcup_{k\geq 0} \text{NTIME}(n^k).
+\end{align*}
+
+P is widely considered as class of problems having efficient solutions. NP is considered as class of problems whose solutions can be verified efficiently.
+
+By ``efficient'' algorithms, we are talking about polynomial time algorithms, that is, $O(n^k)$.
+
+\end{document}
