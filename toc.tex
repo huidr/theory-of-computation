@@ -410,7 +410,95 @@ In a non-deterministic TM, one can have multiple transitions from a given config
   \delta: Q \times \Omega \to 2^{Q \times \Omega \times \{L, R\}}.
 \end{displaymath}
 
-Consider $L = \{ 0^t \mid t \text{ is composite} \}$.
+Consider $L = \{ 0^t \mid t \text{ is composite} \}$. This can be solved using a non-deterministic TM that basically does the following: 
+\begin{enumerate}
+\item\label{item:58} Write down $n_1$ number of $0$'s and $n_2$ number of $1$'s where $2 \leq n_1, n_2 \leq t$. This is non-deterministic.
+\item\label{item:59} Check if $n_1 \times n_2 = t$. If yes, then accept else reject.
+\end{enumerate}
+
+Of course, the above problem can be solved deterministically as well.
+
+\subsection{Configuration graphs}
+
+A config graph $G_{M,x}$  is defined for a TM $M$ w.r.t. an input $x$. Its vertices are the configurations of $G$ w.r.t. $x$. There is an edge from config $C_1$ to $C_2$ if $M$ can go $C_1 \implies C_2$ in one step.
+
+Basically, a config graph is the graphical representation of computation of $M$ on $x$.
+
+A computation path is a path in $G_{M,x}$ from the start config. Clearly, $M$ accepts $x$ iff $\exists$ a computational path in $G_{M,x}$ from the start state to an accept state.
+
+Some properties of config graphs are 
+\begin{enumerate}
+\item\label{item:60} If $M$ is deterministic, the outdegree of every vertex in $G_{M,x} \leq 1$. If $M$ is non-deterministic, the outdegree can be arbitrary. 
+\item\label{item:61} Outdegree of accept and reject state configs are $0$. 
+\item\label{item:62} $G_{M,x}$ may be infinite. But if the size of the tape is bounded, $G_{M,x}$ is finite. 
+\item\label{item:63} $G_{M,x}$ has a unique start and accept config.
+\end{enumerate}
+
+The class of languages accepted by deterministic TM and non-deterministic TM are the same.
+
+\subsection{Closure}
+
+Decidable and recognizable languages are closed under union, concatenation, Kleene star and intersection.
+
+Decidable languages (but not recognizable languages) are closed under taking complements.
+
+A language $L$ is decidable iff $L$ and $\bar{L}$ are both recognizable.
+
+\subsection{Decidability properties}
+
+Let $A_{\text{DFA}} = \{ \langle D, w \rangle \mid D \text{ is a DFA and } w\in L(D) \}$. Is $A_{\text{DFA}}$ decidable? Yes, because we can implement the following algorithm in a halting TM. 
+\begin{enumerate}
+\item\label{item:64} Simulate $D$ on $w$. 
+\item\label{item:65} If $D$ accepts $w$, then accept $\langle D, w \rangle$ else reject.
+\end{enumerate}
+
+Similarly, $A_{\text{NFA}}$ and $A_{\text{RE}}$ are also decidable.
+
+Let $E_{\text{DFA}} = \{ \langle D \rangle \mid D \text{ is a DFA and } L(D)=\emptyset \}$. This is also decidable because we have the following algorithm: 
+\begin{enumerate}
+\item\label{item:66} Check if there is a path in the DFA from the start state to an accept state using BFS. 
+\item\label{item:67} If no path exists then accept else reject.
+\end{enumerate}
+
+$E_{\text{CFG}} = \{ \langle G \rangle \mid G \text{ is a CFG and } L(G)=\emptyset \}$ is also decidable.
+
+The language $EQ_{\text{DFA}} = \{ \langle D_1, D_2 \rangle \mid D_1 \text{ and } D_2 \text{ are DFA and } L(D_1) = L(D_2) \}$ is also decidable. However, $EQ_{\text{CFG}}$ is not decidable.
+
+Church-Turing thesis states that anything that can be computed can be computed by a Turing machine.
+
+An example of non-Turing recognizable language is $L_d = \{ s_j \mid s_j \not\in L(M_j) \}$. This can be proven using Cantor's diagonal argument.
+
+An example of un-decidable language is $A_{\text{TM}} = \{ \langle M, w \rangle \mid M \text{ accepts } w \}$. But this is Turing recognizable. This also means $\overline{A_{\text{TM}}}$ is non Turing recognizable.
+
+We define co-Turing recognizable by 
+\begin{displaymath}
+\text{co-TR} = \{ L \mid \bar{L} \text{ is TR} \}.
+\end{displaymath}
+
+We saw that $A_{\text{TM}} \in \text{ TR}$ and $\overline{A_{\text{TM}}} \in $ co-TR.
+
+The language $H_{\text{TM}} = \{ \langle M, w \rangle \mid M \text{ halts on } w\}$ is un-decidable.
+
+\subsection{Reduction}
+
+Reduction in computer science means to convert one problem to another. For example, multiplication can be reduced to addition. Sorting can be reduced to finding minimum (or maximum).
+
+Suppose $L_1 \leq_m L_2$. 
+\begin{enumerate}
+\item\label{item:69} If $L_2$ is decidable, then $L_1$ is decidable. 
+\item\label{item:70} If $L_1$ is un-decidable, then $L_2$ is un-decidable. 
+\item\label{item:71} If $L_1$ is not TR, then $L_2$ is not TR.
+\end{enumerate}
+
+If  $L_1 \leq_m L_2$, then $L_2$ is at least as hard as $L_1$.
+
+Consider $E_{\text{TM}} = \{ \langle M \rangle \mid M \text{ is a TM and } L(M) = \emptyset \}$. We can show that $\overline{A_{\text{TM}}} \leq_m E_{\text{TM}}$. Since $\overline{A_{\text{TM}}}$ is not TR, $E_{\text{TM}}$ is not TR.
+
+Some other applications would be 
+\begin{enumerate}
+\item\label{item:72} Show $E_{\text{TM}} \leq_m EQ_{\text{TM}}$ by producing a reduction function. Then $EQ_{\text{TM}}$ will be not TR. 
+\item\label{item:73} Let CO
+\end{enumerate}
 
 \section{Complexity theory}
 
